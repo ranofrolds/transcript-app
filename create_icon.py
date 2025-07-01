@@ -138,18 +138,82 @@ def create_simple_icon():
         print(f"❌ Erro ao criar ícone simples: {e}")
         return False
 
+def create_png_icon():
+    """Cria um ícone PNG como alternativa"""
+    try:
+        # Criar ícone 64x64 PNG
+        size = 64
+        img = Image.new('RGBA', (size, size), '#1e1e1e')
+        draw = ImageDraw.Draw(img)
+        
+        # Desenhar microfone
+        center = size // 2
+        mic_width = size // 3
+        mic_height = size // 2
+        
+        # Corpo do microfone
+        mic_left = center - mic_width // 2
+        mic_right = center + mic_width // 2
+        mic_top = center - mic_height // 2
+        mic_bottom = center + mic_height // 4
+        
+        draw.rounded_rectangle(
+            [mic_left, mic_top, mic_right, mic_bottom],
+            radius=mic_width // 4,
+            fill='#00d4aa'
+        )
+        
+        # Haste
+        stem_width = size // 12
+        stem_height = size // 6
+        stem_left = center - stem_width // 2
+        stem_right = center + stem_width // 2
+        stem_top = mic_bottom
+        stem_bottom = stem_top + stem_height
+        
+        draw.rectangle([stem_left, stem_top, stem_right, stem_bottom], fill='#00d4aa')
+        
+        # Base
+        base_width = mic_width
+        base_height = size // 16
+        base_left = center - base_width // 2
+        base_right = center + base_width // 2
+        base_top = stem_bottom
+        base_bottom = base_top + base_height
+        
+        draw.rectangle([base_left, base_top, base_right, base_bottom], fill='#00d4aa')
+        
+        # Detalhes
+        for i in range(3):
+            line_y = mic_top + (mic_bottom - mic_top) * (i + 1) // 4
+            line_left = mic_left + mic_width // 6
+            line_right = mic_right - mic_width // 6
+            draw.line([line_left, line_y, line_right, line_y], fill='#1e1e1e', width=2)
+        
+        # Salvar PNG
+        img.save('icon.png', format='PNG')
+        print("✅ Ícone PNG criado: icon.png")
+        return True
+    except Exception as e:
+        print(f"❌ Erro ao criar ícone PNG: {e}")
+        return False
+
 if __name__ == "__main__":
-    print("🎨 Criando ícone personalizado...")
+    print("🎨 Criando ícones personalizados...")
     
     try:
         # Tentar criar ícone detalhado
         if create_app_icon():
-            print("✅ Sucesso!")
+            print("✅ Ícone ICO criado!")
+            # Também criar PNG
+            create_png_icon()
         else:
             # Fallback para ícone simples
             print("⚠️ Tentando ícone simples...")
             create_simple_icon()
+            create_png_icon()
     except ImportError:
         print("❌ PIL não encontrado. Instalando...")
         os.system("pip install Pillow")
-        create_app_icon() 
+        create_app_icon()
+        create_png_icon() 

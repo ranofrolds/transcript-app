@@ -12,6 +12,7 @@ import pyperclip
 import config
 import json
 import base64
+import sys
 
 class TranscriptApp:
     def __init__(self, root):
@@ -19,6 +20,12 @@ class TranscriptApp:
         self.root.title(config.WINDOW_TITLE)
         self.root.geometry(config.WINDOW_SIZE)
         self.root.resizable(config.WINDOW_RESIZABLE, config.WINDOW_RESIZABLE)
+        
+        # Configurar identificação da aplicação no Windows
+        self.setup_windows_taskbar()
+        
+        # Configurar ícone da aplicação
+        self.setup_app_icon()
         
         # Arquivo para salvar configurações
         self.config_file = "transcritor_config.json"
@@ -34,6 +41,148 @@ class TranscriptApp:
         
         self.setup_ui()
         self.load_api_key()
+        
+        # Aplicar ícone após tudo estar carregado
+        self.root.after(500, self.apply_icon_delayed)
+    
+    def apply_icon_delayed(self):
+        """Aplica o ícone após a janela estar completamente carregada"""
+        icon_path_ico = os.path.abspath('icon.ico')
+        icon_path_png = os.path.abspath('icon.png')
+        
+        try:
+            if os.path.exists(icon_path_ico):
+                # Reaplicar ícone ICO
+                self.root.iconbitmap(icon_path_ico)
+            elif os.path.exists(icon_path_png):
+                # Se ICO não existir, tentar PNG
+                img = tk.PhotoImage(file=icon_path_png)
+                self.root.iconphoto(True, img)
+            
+            # Para Windows - forçar atualização na barra de tarefas
+            if sys.platform == "win32":
+                try:
+                    import ctypes
+                    
+                    # Obter handle da janela
+                    hwnd = int(self.root.frame(), 16)
+                    
+                    # Forçar redesenho da barra de tarefas
+                    ctypes.windll.user32.SetWindowPos(
+                        hwnd, 0, 0, 0, 0, 0, 
+                        0x0001 | 0x0002 | 0x0020  # SWP_NOSIZE | SWP_NOMOVE | SWP_FRAMECHANGED
+                    )
+                    
+                except:
+                    pass
+                    
+        except Exception:
+            pass
+    
+    def setup_windows_taskbar(self):
+        """Configura corretamente o ícone e identificação no Windows"""
+        try:
+            # No Windows, definir um App User Model ID único
+            if sys.platform == "win32":
+                try:
+                    import ctypes
+                    myappid = 'transcriptor.audio.app.1.0'  # ID único da aplicação
+                    ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
+                except:
+                    pass
+        except Exception:
+            pass
+    
+    def setup_app_icon(self):
+        """Configura o ícone da aplicação para janela e barra de tarefas"""
+        icon_path_ico = os.path.abspath('icon.ico')
+        icon_path_png = os.path.abspath('icon.png')
+        
+        try:
+            if not os.path.exists(icon_path_ico):
+                # Tentar gerar ícone se não existir
+                try:
+                    import create_icon
+                    create_icon.create_app_icon()
+                    create_icon.create_png_icon()
+                except:
+                    pass
+            
+            # Tentar ICO primeiro
+            if os.path.exists(icon_path_ico):
+                # Método 1: Configuração básica do ícone
+                try:
+                    self.root.iconbitmap(icon_path_ico)
+                except:
+                    # Se ICO falhar, tentar PNG
+                    try:
+                        if os.path.exists(icon_path_png):
+                            img = tk.PhotoImage(file=icon_path_png)
+                            self.root.iconphoto(True, img)
+                    except:
+                        pass
+                
+                # Método 2: Para Windows - configuração específica da barra de tarefas
+                if sys.platform == "win32":
+                    try:
+                        # Usar bibliotecas Windows específicas
+                        import ctypes
+                        
+                        # Definir constantes do Windows
+                        ICON_SMALL = 0
+                        ICON_BIG = 1
+                        WM_SETICON = 0x0080
+                        
+                        # Aguardar janela estar pronta
+                        self.root.update()
+                        
+                        # Carregar ícone
+                        hicon = ctypes.windll.user32.LoadImageW(
+                            None, 
+                            icon_path, 
+                            1,  # IMAGE_ICON
+                            0, 0, 
+                            0x00000010  # LR_LOADFROMFILE
+                        )
+                        
+                        if hicon:
+                            # Obter handle da janela usando Tkinter
+                            hwnd = int(self.root.frame(), 16)
+                            
+                            # Definir ícone pequeno e grande
+                            ctypes.windll.user32.SendMessageW(hwnd, WM_SETICON, ICON_SMALL, hicon)
+                            ctypes.windll.user32.SendMessageW(hwnd, WM_SETICON, ICON_BIG, hicon)
+                    except Exception as e:
+                        # Método alternativo para Windows
+                        try:
+                            self.root.after(100, lambda: self.root.iconbitmap(icon_path_ico))
+                        except:
+                            pass
+                
+                # Método 3: Configurações alternativas do Tkinter
+                try:
+                    self.root.wm_iconbitmap(icon_path_ico)
+                except:
+                    pass
+                    
+                try:
+                    self.root.tk.call('wm', 'iconbitmap', self.root._w, icon_path_ico)
+                except:
+                    pass
+                    
+        except Exception as e:
+            # Se falhar, tentar criar um ícone simples
+            try:
+                import create_icon
+                create_icon.create_simple_icon()
+                create_icon.create_png_icon()
+                if os.path.exists(icon_path_ico):
+                    self.root.iconbitmap(icon_path_ico)
+                elif os.path.exists(icon_path_png):
+                    img = tk.PhotoImage(file=icon_path_png)
+                    self.root.iconphoto(True, img)
+            except:
+                pass
     
     def setup_dark_theme(self):
         """Configura o tema noturno da aplicação"""
@@ -491,21 +640,7 @@ def main():
     root = tk.Tk()
     app = TranscriptApp(root)
     
-    # Configurar ícone da janela
-    try:
-        if os.path.exists('icon.ico'):
-            root.iconbitmap(default='icon.ico')
-        else:
-            # Tentar gerar ícone se não existir
-            try:
-                import create_icon
-                create_icon.create_app_icon()
-                if os.path.exists('icon.ico'):
-                    root.iconbitmap(default='icon.ico')
-            except:
-                pass
-    except Exception:
-        pass
+
     
     root.mainloop()
 
