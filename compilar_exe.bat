@@ -31,6 +31,16 @@ if errorlevel 1 (
 echo [OK] PyInstaller disponivel
 echo.
 
+REM Gerar ícone personalizado
+echo Gerando icone personalizado...
+python create_icon.py
+if exist "icon.ico" (
+    echo [OK] Icone criado com sucesso!
+) else (
+    echo [AVISO] Icone nao foi criado, compilando sem icone
+)
+echo.
+
 REM Limpar builds anteriores
 if exist "build" (
     echo Limpando build anterior...

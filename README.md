@@ -6,7 +6,8 @@ Aplicação minimalista para transcrição de áudio usando a API Whisper da Ope
 
 - **Gravação de áudio** via microfone com um clique
 - **Transcrição automática** usando OpenAI Whisper API
-- **Interface limpa e minimalista** em Tkinter
+- **Interface limpa e minimalista** com tema noturno elegante
+- **Ícone personalizado** estilizado (microfone profissional)
 - **Copiar texto** para área de transferência
 - **Suporte ao português** (configurável)
 - **API Key salva automaticamente** - não precisa digitar toda vez
@@ -112,19 +113,38 @@ Se encontrar problemas com o microfone:
 
 Para criar um executável standalone:
 
-1. **Instale PyInstaller:**
+### Compilação Automática (Recomendada)
+
+```bash
+# Gera ícone e compila automaticamente
+compilar_exe.bat
+```
+
+### Compilação Manual
+
+1. **Instale dependências:**
 
    ```bash
-   pip install pyinstaller
+   pip install pyinstaller Pillow
    ```
 
-2. **Compile o aplicativo:**
+2. **Gere o ícone (opcional):**
 
    ```bash
-   pyinstaller --onefile --windowed --name "Transcritor" main.py
+   python create_icon.py
    ```
 
-3. **Encontre o .exe em:**
+3. **Compile o aplicativo:**
+
+   ```bash
+   # Com ícone personalizado
+   pyinstaller --onefile --windowed --icon=icon.ico --name "Transcritor" main.pyw
+
+   # Sem ícone
+   pyinstaller --onefile --windowed --name "Transcritor" main.pyw
+   ```
+
+4. **Encontre o .exe em:**
    ```
    dist/Transcritor.exe
    ```
@@ -145,6 +165,7 @@ Para criar um executável standalone:
 | `requests`    | >=2.31.0 | Comunicação com API OpenAI       |
 | `pyperclip`   | >=1.8.2  | Cópia para área de transferência |
 | `openai`      | >=1.3.0  | Client oficial OpenAI (opcional) |
+| `Pillow`      | >=10.0.0 | Geração de ícone personalizado   |
 
 ## ⚙️ Configurações Avançadas
 

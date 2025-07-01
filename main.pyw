@@ -35,13 +35,82 @@ class TranscriptApp:
         self.setup_ui()
         self.load_api_key()
     
+    def setup_dark_theme(self):
+        """Configura o tema noturno da aplicação"""
+        # Configurar janela principal
+        self.root.configure(bg=config.DARK_BG)
+        
+        # Configurar opções padrão para widgets Tkinter
+        self.root.option_add('*TCombobox*Listbox.selectBackground', config.DARK_SELECT_BG)
+        self.root.option_add('*TCombobox*Listbox.background', config.DARK_BG_SECONDARY)
+        self.root.option_add('*TCombobox*Listbox.foreground', config.DARK_FG)
+    
+    def apply_dark_style(self, style):
+        """Aplica estilo escuro aos widgets ttk"""
+        # Configurar estilo para Frame
+        style.configure("TFrame", background=config.DARK_BG)
+        
+        # Configurar estilo para Label
+        style.configure("TLabel", 
+                       background=config.DARK_BG, 
+                       foreground=config.DARK_FG)
+        
+        # Configurar estilo para LabelFrame  
+        style.configure("TLabelframe", 
+                       background=config.DARK_BG, 
+                       foreground=config.DARK_FG,
+                       bordercolor=config.DARK_BORDER)
+        style.configure("TLabelframe.Label", 
+                       background=config.DARK_BG, 
+                       foreground=config.DARK_FG)
+        
+        # Configurar estilo para Button
+        style.configure("TButton",
+                       background=config.DARK_BUTTON_BG,
+                       foreground=config.DARK_FG,
+                       borderwidth=1,
+                       focuscolor='none')
+        style.map("TButton",
+                 background=[('active', config.DARK_BUTTON_HOVER),
+                           ('pressed', config.DARK_ACCENT)])
+        
+        # Configurar estilo para Entry
+        style.configure("TEntry",
+                       fieldbackground=config.DARK_ENTRY_BG,
+                       background=config.DARK_ENTRY_BG,
+                       foreground=config.DARK_FG,
+                       bordercolor=config.DARK_BORDER,
+                       insertcolor=config.DARK_FG)
+        
+        # Configurar estilo especial para botão de gravar
+        style.configure("Record.TButton",
+                       background=config.DARK_ACCENT,
+                       foreground=config.DARK_BG,
+                       font=('Arial', 10, 'bold'))
+        style.map("Record.TButton",
+                 background=[('active', '#00b894'),
+                           ('pressed', '#00a085')])
+        
+        # Configurar estilo para botão parar
+        style.configure("Stop.TButton",
+                       background="#dc3545",
+                       foreground=config.DARK_FG,
+                       font=('Arial', 10, 'bold'))
+        style.map("Stop.TButton",
+                 background=[('active', '#c82333'),
+                           ('pressed', '#bd2130')])
+    
     def setup_ui(self):
+        # Configurar tema noturno
+        self.setup_dark_theme()
+        
         # Configurar menu
         self.setup_menu()
         
         # Configurar estilo
         style = ttk.Style()
         style.theme_use('clam')
+        self.apply_dark_style(style)
         
         # Frame principal
         main_frame = ttk.Frame(self.root, padding="20")
@@ -77,7 +146,14 @@ class TranscriptApp:
             wrap=tk.WORD,
             width=config.TEXT_AREA_WIDTH,
             height=config.TEXT_AREA_HEIGHT,
-            font=config.TEXT_FONT
+            font=config.TEXT_FONT,
+            bg=config.DARK_BG_SECONDARY,
+            fg=config.DARK_FG,
+            insertbackground=config.DARK_FG,
+            selectbackground=config.DARK_SELECT_BG,
+            selectforeground=config.DARK_FG,
+            borderwidth=1,
+            relief="solid"
         )
         self.text_area.grid(row=0, column=0, sticky=(tk.W, tk.E, tk.N, tk.S))
         
@@ -98,11 +174,19 @@ class TranscriptApp:
     
     def setup_menu(self):
         """Configura o menu da aplicação"""
-        menubar = tk.Menu(self.root)
+        menubar = tk.Menu(self.root, 
+                         bg=config.DARK_BG_SECONDARY, 
+                         fg=config.DARK_FG,
+                         activebackground=config.DARK_ACCENT,
+                         activeforeground=config.DARK_BG)
         self.root.config(menu=menubar)
         
         # Menu Configurações
-        config_menu = tk.Menu(menubar, tearoff=0)
+        config_menu = tk.Menu(menubar, tearoff=0,
+                             bg=config.DARK_BG_SECONDARY, 
+                             fg=config.DARK_FG,
+                             activebackground=config.DARK_ACCENT,
+                             activeforeground=config.DARK_BG)
         menubar.add_cascade(label="Configurações", menu=config_menu)
         config_menu.add_command(label="Alterar API Key", command=self.change_api_key)
         config_menu.add_command(label="Remover API Key", command=self.remove_api_key)
@@ -110,7 +194,11 @@ class TranscriptApp:
         config_menu.add_command(label="Sobre", command=self.show_about)
         
         # Menu Ajuda
-        help_menu = tk.Menu(menubar, tearoff=0)
+        help_menu = tk.Menu(menubar, tearoff=0,
+                           bg=config.DARK_BG_SECONDARY, 
+                           fg=config.DARK_FG,
+                           activebackground=config.DARK_ACCENT,
+                           activeforeground=config.DARK_BG)
         menubar.add_cascade(label="Ajuda", menu=help_menu)
         help_menu.add_command(label="Como Usar", command=self.show_help)
         help_menu.add_command(label="Obter API Key", command=self.open_api_key_url)
@@ -403,10 +491,20 @@ def main():
     root = tk.Tk()
     app = TranscriptApp(root)
     
-    # Configurar ícone da janela (opcional)
+    # Configurar ícone da janela
     try:
-        root.iconbitmap(default='icon.ico')  # Se tiver um ícone
-    except:
+        if os.path.exists('icon.ico'):
+            root.iconbitmap(default='icon.ico')
+        else:
+            # Tentar gerar ícone se não existir
+            try:
+                import create_icon
+                create_icon.create_app_icon()
+                if os.path.exists('icon.ico'):
+                    root.iconbitmap(default='icon.ico')
+            except:
+                pass
+    except Exception:
         pass
     
     root.mainloop()

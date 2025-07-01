@@ -1,5 +1,7 @@
 # 🚀 Início Rápido - Transcritor de Áudio
 
+> **Aplicativo com tema noturno elegante e ícone personalizado** 🌙
+
 ## 📋 Pré-requisitos
 
 - Python 3.8+
@@ -51,12 +53,16 @@ pythonw main.pyw
 ## 🔧 Compilar para .EXE
 
 ```bash
-# Execute:
+# Automático (recomendado) - gera ícone + compila:
 compilar_exe.bat
 
-# Ou manual:
-pip install pyinstaller
-pyinstaller --onefile --windowed --name "Transcritor" main.py
+# Só gerar ícone + compilar:
+gerar_icon_e_compilar.bat
+
+# Manual:
+pip install pyinstaller Pillow
+python create_icon.py
+pyinstaller --onefile --windowed --icon=icon.ico --name "Transcritor" main.pyw
 ```
 
 Executável estará em: `dist/Transcritor.exe`

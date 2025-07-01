@@ -16,6 +16,17 @@ WINDOW_TITLE = "Transcritor de Áudio"
 WINDOW_SIZE = "500x400"
 WINDOW_RESIZABLE = True
 
+# Tema Noturno - Cores
+DARK_BG = "#1e1e1e"          # Fundo principal escuro
+DARK_FG = "#ffffff"          # Texto branco
+DARK_BG_SECONDARY = "#2d2d2d" # Fundo secundário
+DARK_ACCENT = "#00d4aa"      # Cor de destaque (verde-azulado)
+DARK_BUTTON_BG = "#3c3c3c"   # Fundo dos botões
+DARK_BUTTON_HOVER = "#4a4a4a" # Botão em hover
+DARK_ENTRY_BG = "#2d2d2d"    # Fundo de entrada de texto
+DARK_BORDER = "#404040"      # Bordas
+DARK_SELECT_BG = "#0d7377"   # Seleção de texto
+
 # Textos dos botões
 BUTTON_RECORD = "🎤 Gravar"
 BUTTON_STOP = "⏹️ Parar"
