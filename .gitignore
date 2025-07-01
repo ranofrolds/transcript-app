@@ -1,0 +1,32 @@
+# Arquivos de configuração (contém API key)
+transcritor_config.json
+
+# Arquivos temporários
+*.tmp
+*.wav
+*.mp3
+
+# Arquivos de build
+build/
+dist/
+*.spec
+
+# Cache Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Arquivos IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+log.txt
+
+# Arquivos do sistema
+Thumbs.db
+.DS_Store 
